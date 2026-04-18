@@ -10,7 +10,7 @@ A research-oriented framework for identifying financial market regimes using **H
 
 ## Overview
 
-Market regimes—distinct periods characterized by persistent levels of volatility, trend, or mean reversion—pose a significant challenge to static investment strategies. This repository demonstrates how HMMs, as unsupervised probabilistic models, can effectively uncover these latent states from observable market data like returns and volatility. The project emphasizes a comparative analysis, benchmarking HMMs against both probabilistic (Gaussian Mixture Models) and deterministic (K-Means, Hierarchical Clustering) alternatives, as well as supervised and anomaly detection methods, to provide a holistic view of regime classification in quantitative finance.
+Market regimes, distinct periods characterized by persistent levels of volatility, trend, or mean reversion, pose a significant challenge to static investment strategies. This repository demonstrates how HMMs, as unsupervised probabilistic models, can effectively uncover these latent states from observable market data like returns and volatility. The project emphasizes a comparative analysis, benchmarking HMMs against both probabilistic (Gaussian Mixture Models) and deterministic (K-Means, Hierarchical Clustering) alternatives, as well as supervised and anomaly detection methods, to provide a holistic view of regime classification in quantitative finance.
 
 ---
 
@@ -100,10 +100,10 @@ jupyter lab
 
 Run the notebooks in the recommended order to follow the research narrative:
 
-1. `01_hmm_from_scratch/01_hmm_from_scratch.ipynb` — Understand the inner workings of an HMM by using a custom implementation.
-2. `02_hmm_libraries/02_hmm_libraries.ipynb` — See how the same problem is solved efficiently using `hmmlearn` and `pomegranate`.
-3. `03_alternative_methods/03_alternative_methods.ipynb` — Explore how other unsupervised and supervised methods perform on the regime detection task.
-4. `04_model_comparison/04_model_comparison.ipynb` — Examine the final comparative analysis across all models to draw conclusions.
+1. `01_hmm_from_scratch/01_hmm_from_scratch.ipynb` - Understand the inner workings of an HMM by using a custom implementation.
+2. `02_hmm_libraries/02_hmm_libraries.ipynb` - See how the same problem is solved efficiently using `hmmlearn` and `pomegranate`.
+3. `03_alternative_methods/03_alternative_methods.ipynb` - Explore how other unsupervised and supervised methods perform on the regime detection task.
+4. `04_model_comparison/04_model_comparison.ipynb` - Examine the final comparative analysis across all models to draw conclusions.
 
 ---
 
@@ -140,17 +140,17 @@ The project follows a rigorous, multi-stage methodology:
 
 This module contains a fully self-contained `GaussianHMM` class written in Python with NumPy. It implements all core algorithms:
 
-- `forward_pass()` — Computes scaled forward probabilities.
-- `backward_pass()` — Computes scaled backward probabilities.
-- `viterbi()` — Implements the Viterbi algorithm in log-space for numerical stability.
-- `fit()` — Performs parameter learning via the Expectation-Maximization (Baum-Welch) algorithm.
+- `forward_pass()` - Computes scaled forward probabilities.
+- `backward_pass()` - Computes scaled backward probabilities.
+- `viterbi()` - Implements the Viterbi algorithm in log-space for numerical stability.
+- `fit()` - Performs parameter learning via the Expectation-Maximization (Baum-Welch) algorithm.
 
 ### `02_hmm_libraries`
 
 This notebook demonstrates the practical application of HMMs using two popular libraries:
 
-- **`hmmlearn`** — A scikit-learn compatible library offering `GaussianHMM` and `GMMHMM` models.
-- **`pomegranate`** — A modern probabilistic modeling library that provides a flexible `DenseHMM` implementation.
+- **`hmmlearn`** - A scikit-learn compatible library offering `GaussianHMM` and `GMMHMM` models.
+- **`pomegranate`** - A modern probabilistic modeling library that provides a flexible `DenseHMM` implementation.
 
 The notebook verifies the numerical consistency between these libraries and the custom implementation, comparing execution speed and ease of use.
 
@@ -158,9 +158,9 @@ The notebook verifies the numerical consistency between these libraries and the 
 
 The utility modules provide a solid foundation for the entire project:
 
-- **`data_utils.py`** — Handles all data acquisition and feature engineering. Includes functions to fetch data from Yahoo Finance, compute log-returns, realized volatility, and other technical indicators, and to create feature matrices for modeling.
-- **`viz_utils.py`** — Provides a suite of functions for creating interactive Plotly charts. Includes tools for overlaying regime bands on price charts, plotting transition matrices as heatmaps, and visualizing distributional characteristics of regimes.
-- **`metrics.py`** — Implements all the quantitative evaluation metrics used across the project, ensuring consistency and reproducibility in the analysis.
+- **`data_utils.py`** - Handles all data acquisition and feature engineering. Includes functions to fetch data from Yahoo Finance, compute log-returns, realized volatility, and other technical indicators, and to create feature matrices for modeling.
+- **`viz_utils.py`** - Provides a suite of functions for creating interactive Plotly charts. Includes tools for overlaying regime bands on price charts, plotting transition matrices as heatmaps, and visualizing distributional characteristics of regimes.
+- **`metrics.py`** - Implements all the quantitative evaluation metrics used across the project, ensuring consistency and reproducibility in the analysis.
 
 ---
 
@@ -171,16 +171,16 @@ The utility modules provide a solid foundation for the entire project:
 3. McGreevy, J. (2021). Hidden Markov Models in Finance. Imperial College London, MSc Thesis.
 4. Tsang, E. (2021). Market Regime Detection using Hidden Markov Models in QSTrader. *QuantStart*.
 5. Chen, X. (2025). HMM-based market regime detection with reinforcement learning. *IDS*.
-6. Hikmath Technologies — Market Regime Detection: From HMMs to Wasserstein Clustering.
+6. Hikmath Technologies: Market Regime Detection: From HMMs to Wasserstein Clustering.
 
 ---
 
 ## Acknowledgements
 
-This project was developed as part of the coursework for **AI111 (Mathematical Foundations of AI & Data Engineering)** under the guidance and mentorship of **Dr. Puneet Kumar**. It builds upon the theoretical foundations and practical applications of Hidden Markov Models in quantitative finance, drawing inspiration from both academic research and industry practices in market regime detection.
+This project was developed as part of the coursework for **AI111 (Mathematical Foundations of AI & Data Engineering)** under the guidance and mentorship of [**Dr. Puneet Kumar**](https://puneetkumar.com/). It builds upon the theoretical foundations and practical applications of Hidden Markov Models in quantitative finance, drawing inspiration from both academic research and industry practices in market regime detection.
 
 ---
 
 ## License
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
