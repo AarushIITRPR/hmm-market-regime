@@ -1,35 +1,10 @@
-"""
-01_hmm_from_scratch/hmm_core.py
-================================
-From-scratch implementation of a Gaussian Hidden Markov Model.
-
-Notation follows the Quant Guild reference PDF (Paolucci, 2025) exactly:
-
-    λ = (π, A, µ, σ)
-    N  — number of hidden states
-    T  — length of observation sequence
-    αt(i)  — forward variable     P(O₁..Ot, Qt=Si | λ)
-    βt(i)  — backward variable    P(Ot+1..OT | Qt=Si, λ)
-    γt(i)  — state occupancy      P(Qt=Si | O, λ)
-    ξt(i,j) — transition occupancy P(Qt=Si, Qt+1=Sj | O, λ)
-
-Three Canonical Problems (§3.2 of ref. PDF)
---------------------------------------------
-P1  Evaluation  → forward_pass()  / log_likelihood()
-P2  Decoding    → viterbi()
-P3  Learning    → baum_welch()    (EM)
-"""
-
 from __future__ import annotations
 
 import numpy as np
 from scipy.stats import norm
 from typing import List, Optional, Tuple
 
-
-# ---------------------------------------------------------------------------
 # Gaussian emission helper
-# ---------------------------------------------------------------------------
 
 def _gaussian_pdf(x: float, mu: float, sigma: float) -> float:
     """b_j(O_t) = N(O_t; µ_j, σ_j²)   — scalar version."""
