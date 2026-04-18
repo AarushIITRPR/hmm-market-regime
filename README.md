@@ -59,8 +59,8 @@ The project's foundation is the **Gaussian Hidden Markov Model**, a doubly stoch
 - **Forward-Backward Algorithm:** Computes the posterior probabilities of being in a particular state at each time point:
 $$\gamma_t(i) = P(S_t = i \mid O_1, \ldots, O_T, \lambda)$$
 
-- **Viterbi Algorithm:** Finds the single most likely sequence of hidden states given the observations:
-$$\hat{S}_1, \ldots, \hat{S}_T = \arg\max_{S_1,\ldots,S_T} P(S_1,\ldots,S_T \mid O_1,\ldots,O_T, \lambda)$$
+- **Viterbi Algorithm:** Finds the most likely sequence:
+$\hat{S}_1, \ldots, \hat{S}_T = \arg\max_{S_1,\ldots,S_T} P(S_1,\ldots,S_T \mid O_1,\ldots,O_T, \lambda)$
 
 - **Baum-Welch Algorithm (EM):** An Expectation-Maximization procedure that iteratively re-estimates the model parameters $\lambda = (\mathbf{A}, \boldsymbol{\mu}, \boldsymbol{\Sigma})$ to maximize the likelihood of the observed data.
 
