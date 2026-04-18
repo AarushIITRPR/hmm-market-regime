@@ -1,12 +1,3 @@
-"""
-utils/viz_utils.py
-------------------
-Reusable interactive Plotly visualisation helpers for market regime detection.
-
-All functions return plotly.graph_objects.Figure objects so callers can
-further customise before calling .show().
-"""
-
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
@@ -15,17 +6,12 @@ from plotly.subplots import make_subplots
 from scipy.stats import norm
 from typing import List, Optional, Dict
 
-
-# ---------------------------------------------------------------------------
-# Colour palette (consistent across notebooks)
-# ---------------------------------------------------------------------------
-
 REGIME_COLOURS = {
-    0: "rgba(99,  200, 180, 0.85)",   # teal   – low vol / calm
-    1: "rgba(255, 195,  55, 0.85)",   # amber  – medium vol
-    2: "rgba(240,  80,  80, 0.85)",   # red    – high vol / stress
-    3: "rgba(140, 100, 240, 0.85)",   # purple – 4th state
-    4: "rgba( 80, 160, 240, 0.85)",   # blue   – 5th state
+    0: "rgba(99,  200, 180, 0.85)",
+    1: "rgba(255, 195,  55, 0.85)",
+    2: "rgba(240,  80,  80, 0.85)",
+    3: "rgba(140, 100, 240, 0.85)",
+    4: "rgba( 80, 160, 240, 0.85)",
     "Low":  "rgba(99,  200, 180, 0.85)",
     "Med":  "rgba(255, 195,  55, 0.85)",
     "High": "rgba(240,  80,  80, 0.85)",
@@ -40,15 +26,9 @@ _DARK_LAYOUT = dict(
     legend=dict(bgcolor="rgba(30,30,40,0.8)", bordercolor="rgba(80,80,80,0.5)", borderwidth=1),
 )
 
-
 def _apply_dark(fig: go.Figure) -> go.Figure:
     fig.update_layout(**_DARK_LAYOUT)
     return fig
-
-
-# ---------------------------------------------------------------------------
-# 1.  Price + regime background shading
-# ---------------------------------------------------------------------------
 
 def plot_price_with_regimes(
     df: pd.DataFrame,
@@ -57,20 +37,10 @@ def plot_price_with_regimes(
     title: str = "Price with Regime Overlay",
     regime_labels: Optional[Dict] = None,
 ) -> go.Figure:
-    """
-    Candlestick/line price chart with coloured background bands per regime.
-
-    Parameters
-    ----------
-    df           : must have DatetimeIndex, price_col, regime_col
-    regime_col   : column of integer or string regime labels
-    regime_labels: optional dict {label: display_name}
-    """
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
                         row_heights=[0.7, 0.3],
                         subplot_titles=(title, "Log-Returns"))
 
-    # Price line
     fig.add_trace(go.Scatter(
         x=df.index, y=df[price_col],
         name=price_col,
@@ -78,7 +48,6 @@ def plot_price_with_regimes(
         hovertemplate="%{x|%Y-%m-%d}<br>Price: %{y:.2f}<extra></extra>",
     ), row=1, col=1)
 
-    # Returns bars
     if "Returns" in df.columns:
         colours = ["rgba(99,200,140,0.7)" if r >= 0 else "rgba(240,80,80,0.7)"
                    for r in df["Returns"]]
@@ -89,7 +58,6 @@ def plot_price_with_regimes(
             hovertemplate="%{x|%Y-%m-%d}<br>Return: %{y:.4f}<extra></extra>",
         ), row=2, col=1)
 
-    # Regime shading
     labels = df[regime_col].values
     unique = list(dict.fromkeys(labels))
     legend_added = set()
@@ -126,18 +94,12 @@ def plot_price_with_regimes(
                       xaxis2_rangeslider_visible=False)
     return fig
 
-
-# ---------------------------------------------------------------------------
-# 2.  Regime-conditional return distributions
-# ---------------------------------------------------------------------------
-
 def plot_regime_distributions(
     df: pd.DataFrame,
     regime_col: str,
     return_col: str = "Returns",
     title: str = "Regime-Conditional Return Distributions",
 ) -> go.Figure:
-    """Overlay empirical histogram + fitted Gaussian per regime."""
     fig = go.Figure()
     labels = sorted(df[regime_col].unique())
     x = np.linspace(df[return_col].quantile(0.001), df[return_col].quantile(0.999), 800)
@@ -148,7 +110,6 @@ def plot_regime_distributions(
         mu, sigma = returns.mean(), returns.std()
         colour = REGIME_COLOURS.get(lbl, "rgba(200,200,200,0.7)")
 
-        # Histogram
         fig.add_trace(go.Histogram(
             x=returns * 100,
             histnorm="probability density",
@@ -159,7 +120,6 @@ def plot_regime_distributions(
             hovertemplate=f"State {lbl}<br>Return: %{{x:.2f}}%<br>Density: %{{y:.2f}}<extra></extra>",
         ))
 
-        # Fitted Gaussian PDF
         pdf = norm.pdf(x, mu, sigma)
         fig.add_trace(go.Scatter(
             x=x * 100, y=pdf,
@@ -174,11 +134,6 @@ def plot_regime_distributions(
         **_DARK_LAYOUT,
     )
     return fig
-
-
-# ---------------------------------------------------------------------------
-# 3.  Transition matrix heatmap
-# ---------------------------------------------------------------------------
 
 def plot_transition_matrix(
     A: np.ndarray,
@@ -202,11 +157,6 @@ def plot_transition_matrix(
     ))
     fig.update_layout(title=title, height=400, **_DARK_LAYOUT)
     return fig
-
-
-# ---------------------------------------------------------------------------
-# 4.  Forward / Backward variable heatmap (diagnostic)
-# ---------------------------------------------------------------------------
 
 def plot_alpha_beta(
     alpha: np.ndarray,
@@ -235,11 +185,6 @@ def plot_alpha_beta(
 
     fig.update_layout(title="Forward & Backward Variables", height=500, **_DARK_LAYOUT)
     return fig
-
-
-# ---------------------------------------------------------------------------
-# 5.  State occupancy (gamma) over time
-# ---------------------------------------------------------------------------
 
 def plot_gamma(
     gamma: np.ndarray,
@@ -271,11 +216,6 @@ def plot_gamma(
     )
     return fig
 
-
-# ---------------------------------------------------------------------------
-# 6.  Log-likelihood convergence curve
-# ---------------------------------------------------------------------------
-
 def plot_log_likelihood(
     log_likelihoods: List[float],
     title: str = "Baum-Welch Convergence — Log-Likelihood",
@@ -295,11 +235,6 @@ def plot_log_likelihood(
         height=380, **_DARK_LAYOUT,
     )
     return fig
-
-
-# ---------------------------------------------------------------------------
-# 7.  AIC / BIC comparison bar chart
-# ---------------------------------------------------------------------------
 
 def plot_aic_bic(
     model_names: List[str],
@@ -326,11 +261,6 @@ def plot_aic_bic(
         height=400, **_DARK_LAYOUT,
     )
     return fig
-
-
-# ---------------------------------------------------------------------------
-# 8.  Viterbi path overlay on returns
-# ---------------------------------------------------------------------------
 
 def plot_viterbi_path(
     df: pd.DataFrame,
@@ -369,18 +299,10 @@ def plot_viterbi_path(
     fig.update_layout(height=520, **_DARK_LAYOUT)
     return fig
 
-
-# ---------------------------------------------------------------------------
-# 9.  Regime statistics summary (returns & vol per state)
-# ---------------------------------------------------------------------------
-
 def plot_regime_stats(
     regime_stats: Dict,
     title: str = "Regime Statistics",
 ) -> go.Figure:
-    """
-    regime_stats: {label: {'mean': float, 'std': float, 'count': int}}
-    """
     labels = list(regime_stats.keys())
     means  = [regime_stats[l]["mean"] * 100 for l in labels]
     stds   = [regime_stats[l]["std"] * 100 for l in labels]
