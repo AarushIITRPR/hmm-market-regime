@@ -1,4 +1,4 @@
-# Market Regime Detection — Probabilistic ML Methods
+# Market Regime Detection
 
 A comprehensive, research-grade implementation of market regime detection using Hidden Markov Models and alternative machine learning methods, applied to real financial data.
 
