@@ -123,4 +123,4 @@ jupyter notebook
 
 ## Acknowledgements
 
-This project builds on standard HMM theory and market regime detection methods from the quantitative finance and machine learning literature under the faculty of AI111 (Mathematical Foundations of AI & DE), Dr. [Puneet Kumar](https://puneetkumar.com/).
+This project builds on standard HMM theory and market regime detection methods from the quantitative finance and machine learning literature under the faculty of AI111 (Mathematical Foundations of AI & DE), [Dr. Puneet Kumar](https://puneetkumar.com/).
