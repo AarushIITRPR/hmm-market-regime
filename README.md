@@ -114,33 +114,6 @@ Start Jupyter Notebook from the project root:
 jupyter notebook
 ```
 
-## File Descriptions
-
-### utils/data_utils.py
-Handles:
-- data fetching
-- preprocessing
-- feature engineering
-
-### utils/viz_utils.py
-Contains reusable visualization helpers for:
-- regime plots
-- distributions
-- comparison charts
-
-### utils/metrics.py
-Provides evaluation tools such as:
-- AIC
-- BIC
-- persistence
-- other regime quality metrics
-
-### 01_hmm_from_scratch/hmm_core.py
-Core HMM implementation for:
-- inference
-- decoding
-- training
-
 ## References
 
 - Rabiner, L. R. (1989). A tutorial on hidden Markov models and selected applications in speech recognition  
