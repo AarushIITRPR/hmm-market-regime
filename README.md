@@ -1,114 +1,157 @@
-# Market Regime Detection
+# HMM for Market Regime Detection
 
-A comprehensive, research-grade implementation of market regime detection using Hidden Markov Models and alternative machine learning methods, applied to real financial data.
+A research-oriented project for detecting market regimes using Hidden Markov Models (HMMs) and alternative machine learning methods on financial data.
 
----
+## Overview
 
-## Project Structure
+This repository explores how different probabilistic and clustering-based approaches can be used to identify market regimes such as low-volatility, high-volatility, and transitional states.
 
-```
-market-regime-detection/
+The project includes:
+- a from-scratch HMM implementation
+- library-based HMM experiments
+- alternative unsupervised and supervised methods
+- a final model comparison notebook
+
+## Repository Structure
+
+```text
+HMM-for-Market-Regime-Detection/
 ├── README.md
 ├── requirements.txt
-│
 ├── utils/
-│   ├── data_utils.py          # Data fetching, preprocessing, feature engineering
-│   ├── viz_utils.py           # Reusable Plotly visualisation helpers
-│   └── metrics.py             # Regime evaluation metrics (AIC, BIC, persistence, etc.)
-│
+│   ├── data_utils.py
+│   ├── viz_utils.py
+│   └── metrics.py
 ├── 01_hmm_from_scratch/
-│   ├── hmm_core.py            # GaussianHMM — Forward, Backward, Viterbi, Baum-Welch
+│   ├── hmm_core.py
 │   └── 01_hmm_from_scratch.ipynb
-│
 ├── 02_hmm_libraries/
-│   └── 02_hmm_libraries.ipynb # hmmlearn, pomegranate — comparison with scratch impl.
-│
+│   └── 02_hmm_libraries.ipynb
 ├── 03_alternative_methods/
-│   └── 03_alternative_methods.ipynb  # GMM, K-Means, DBSCAN, Random Forest, Wasserstein
-│
+│   └── 03_alternative_methods.ipynb
 └── 04_model_comparison/
-    └── 04_model_comparison.ipynb     # Head-to-head evaluation & summary dashboard
+    └── 04_model_comparison.ipynb
 ```
 
----
+## What’s Included
 
-## Notebooks at a Glance
+### 01. HMM From Scratch
+Implements the core HMM algorithms manually, including:
+- Forward algorithm
+- Backward algorithm
+- Viterbi decoding
+- Baum-Welch training
 
-| Notebook | Contents |
-|---|---|
-| `01_hmm_from_scratch` | Forward/Backward algorithms, Viterbi decoding, Baum-Welch EM — all hand-coded with full mathematical commentary matching the reference PDF notation |
-| `02_hmm_libraries` | Same regimes reproduced via `hmmlearn` and `pomegranate`; numerical agreement with scratch impl. verified |
-| `03_alternative_methods` | GMM, K-Means, DBSCAN, Agglomerative Clustering, Isolation Forest (anomaly), Random Forest (supervised labelling), Wasserstein-distance clustering |
-| `04_model_comparison` | AIC/BIC, regime persistence, log-likelihood, regime purity, qualitative comparison table |
+This notebook is useful for understanding the mathematical foundation of HMMs in detail.
 
-All charts are **interactive Plotly figures**.
+### 02. HMM Libraries
+Recreates the regime detection workflow using popular HMM libraries such as:
+- hmmlearn
+- pomegranate
 
----
+This section helps compare a custom implementation against standard tools.
 
-## Algorithms Implemented from Scratch (`hmm_core.py`)
+### 03. Alternative Methods
+Benchmarks non-HMM approaches such as:
+- Gaussian Mixture Models
+- K-Means clustering
+- DBSCAN
+- Agglomerative clustering
+- Isolation Forest
+- Random Forest
+- Wasserstein-distance based clustering
 
-### Problem 1 — Evaluation: Forward Algorithm
-$$\alpha_t(i) = P(O_1,\dots,O_t,\, Q_t=S_i \mid \lambda)$$
+### 04. Model Comparison
+Summarizes and compares the methods using:
+- log-likelihood
+- AIC and BIC
+- regime persistence
+- regime purity
+- qualitative comparison plots
 
-Initialisation: $\alpha_1(i) = \pi_i \, b_i(O_1)$
+## Features
 
-Recursion: $\alpha_{t+1}(j) = \left[\sum_{i=1}^{N} \alpha_t(i)\, a_{ij}\right] b_j(O_{t+1})$
+- Modular utility functions for data, visualization, and metrics
+- Notebook-based research workflow
+- Interactive Plotly visualizations
+- Side-by-side comparison of probabilistic and non-probabilistic methods
+- Focus on interpretability for financial regime analysis
 
-### Problem 1 — Evaluation: Backward Algorithm
-$$\beta_t(i) = P(O_{t+1},\dots,O_T \mid Q_t=S_i,\lambda)$$
+## Mathematical Core
 
-### Problem 2 — Decoding: Viterbi Algorithm
-$$\delta_t(i) = \max_{Q_1,\dots,Q_{t-1}} P(Q_1,\dots,Q_t=S_i,O_1,\dots,O_t \mid \lambda)$$
+The HMM formulation used in this project follows the standard setup:
 
-Back-pointer: $\psi_t(j) = \arg\max_i \delta_{t-1}(i)\, a_{ij}$
+- hidden states represent latent market regimes
+- observations are financial market features
+- transitions model regime persistence over time
+- emissions model the distribution of observed data within each regime
 
-### Problem 3 — Learning: Baum-Welch (EM)
+The project covers:
+- evaluation with Forward and Backward algorithms
+- decoding with Viterbi
+- parameter learning with Baum-Welch EM
 
-**E-step** — state occupancy $\gamma_t(i)$ and transition occupancy $\xi_t(i,j)$
-
-**M-step** — closed-form Gaussian re-estimation:
-
-$$\mu_j^{\text{new}} = \frac{\sum_t \gamma_t(j)\, O_t}{\sum_t \gamma_t(j)}, \qquad \sigma_j^{2,\text{new}} = \frac{\sum_t \gamma_t(j)\,(O_t - \mu_j^{\text{new}})^2}{\sum_t \gamma_t(j)}$$
-
----
-
-## Quick Start
+## Installation
 
 ```bash
-git clone https://github.com/<your-username>/market-regime-detection
-cd market-regime-detection
+git clone https://github.com/arjunaggarwaliit/HMM-for-Market-Regime-Detection.git
+cd HMM-for-Market-Regime-Detection
 pip install -r requirements.txt
+```
+
+## Usage
+
+Run the notebooks in this order:
+
+1. 01_hmm_from_scratch  
+2. 02_hmm_libraries  
+3. 03_alternative_methods  
+4. 04_model_comparison  
+
+Start Jupyter Notebook from the project root:
+
+```bash
 jupyter notebook
 ```
 
-Run notebooks in order: `01` → `02` → `03` → `04`.
+## File Descriptions
 
----
+### utils/data_utils.py
+Handles:
+- data fetching
+- preprocessing
+- feature engineering
+
+### utils/viz_utils.py
+Contains reusable visualization helpers for:
+- regime plots
+- distributions
+- comparison charts
+
+### utils/metrics.py
+Provides evaluation tools such as:
+- AIC
+- BIC
+- persistence
+- other regime quality metrics
+
+### 01_hmm_from_scratch/hmm_core.py
+Core HMM implementation for:
+- inference
+- decoding
+- training
 
 ## References
 
-1. Rabiner, L. R. (1989). A tutorial on hidden Markov models and selected applications in speech recognition. *Proceedings of the IEEE*, 77(2), 257–286.
-
-2. Nguyen, N., & Nguyen, D. (2015). Hidden Markov Model for Stock Selection. *Risks*, 3(4), 455–473. https://doi.org/10.3390/risks3040455
-
-3. McGreevy, J. (2021). *Hidden Markov Models in Finance*. Imperial College London MSc dissertation. https://www.imperial.ac.uk/media/imperial-college/faculty-of-natural-sciences/department-of-mathematics/math-finance/212236006---James-Mc-Greevy---MCGREEVY_JAMES_01075416.pdf
-
-4. Paolucci, R. (2025). *Hidden Markov Models for Quantitative Finance*. Quant Guild. (Reference PDF — notation used throughout this project.)
-
-5. Chen, X. (2025). HMM-based market regime detection with RL for portfolio management. *IDS*.
-
-6. Nguyen, T. et al. (2024). Market Regime Detection: From Hidden Markov Models to Wasserstein Clustering. *Hikmath Technologies Publication*. https://publication.hikmahtechnologies.com/market-regime-detection-from-hidden-markov-models-to-wasserstein-clustering-6ba0a09559dc
-
-7. Hassan, R. et al. (2005). A combination of hidden Markov model and fuzzy model for stock market forecasting. *Neurocomputing*.
-
-8. LSEG API Samples. Market Regime Detection Using Statistical and ML-Based Approaches. https://github.com/LSEG-API-Samples/Article.RD.Python.MarketRegimeDetectionUsingStatisticalAndMLBasedApproaches
-
-9. Liechty, J. C. et al. (2008). Portfolio selection with higher moments. *Quantitative Finance*. (SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3406068)
-
-10. QuantStart. Market Regime Detection Using Hidden Markov Models in QSTrader. https://www.quantstart.com/articles/market-regime-detection-using-hidden-markov-models-in-qstrader/
-
----
+- Rabiner, L. R. (1989). A tutorial on hidden Markov models and selected applications in speech recognition  
+- Nguyen, N., & Nguyen, D. (2015). Hidden Markov Model for Stock Selection  
+- McGreevy, J. (2021). Hidden Markov Models in Finance  
+- Additional quantitative finance and market regime detection literature  
 
 ## License
 
-MIT License — free to use, modify, and distribute.
+MIT License.
+
+## Acknowledgements
+
+This project builds on standard HMM theory and market regime detection methods from the quantitative finance and machine learning literature.
