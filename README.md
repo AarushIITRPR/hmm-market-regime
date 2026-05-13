@@ -134,10 +134,46 @@ Start the minimal API backend with:
 uvicorn app.main:app --reload
 ```
 
+### React Dashboard
+
+Start the Vite dashboard with:
+
+```bash
+npm install
+npm run dev
+```
+
+The frontend runs at `http://127.0.0.1:5173` and calls the FastAPI backend at
+`http://127.0.0.1:8000` by default. Override the API base URL with
+`VITE_API_BASE_URL` when needed.
+
+### Docker Compose
+
+Run the full-stack application with:
+
+```bash
+docker-compose up
+```
+
+Use `docker-compose up --build` after changing Dockerfiles or dependencies.
+
+The containerized frontend is served at `http://localhost:3000`. It calls the
+backend through the frontend container's `/api` proxy, which forwards requests to
+the `backend` service on Docker's internal network. The backend is also exposed
+directly at `http://localhost:8000`.
+
+Useful environment variables:
+
+- `API_BASE_URL` - frontend runtime API URL, defaults to `/api` in Docker.
+- `HOST` - backend bind host, defaults to `0.0.0.0`.
+- `PORT` - backend port, defaults to `8000`.
+- `BACKEND_CORS_ORIGINS` - comma-separated list of allowed browser origins.
+
 Available endpoints:
 
 - `GET /health`
 - `POST /predict`
+- `POST /predict-ticker`
 
 Example prediction payload:
 
@@ -154,7 +190,21 @@ Example prediction payload:
     }
   ],
   "n_states": 3,
-  "n_iter": 200
+  "n_iter": 100
+}
+```
+
+Example ticker prediction payload:
+
+```json
+{
+  "ticker": "SPY",
+  "start_date": "2023-01-01",
+  "end_date": "2024-01-01",
+  "n_states": 3,
+  "n_iter": 100,
+  "tol": 0.000001,
+  "random_state": 42
 }
 ```
 
