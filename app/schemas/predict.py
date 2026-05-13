@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date as Date
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 class OHLCVRecord(BaseModel):
     """Single OHLCV observation."""
 
-    date: Optional[date] = None
+    date: Optional[Date] = None
     open: float = Field(..., gt=0)
     high: float = Field(..., gt=0)
     low: float = Field(..., gt=0)

@@ -6,11 +6,13 @@ import pandas as pd
 
 from app.schemas.predict import OHLCVRecord, PredictionRequest, PredictionResponse
 from market_regime import predict_market_regime
+from market_regime.preprocessing import add_log_returns
 
 
 def predict_regimes(request: PredictionRequest) -> PredictionResponse:
     """Run market regime inference for a prediction request."""
     frame = _records_to_frame(request.data)
+    frame = add_log_returns(frame)
     prediction = predict_market_regime(
         frame,
         n_states=request.n_states,
