@@ -1,14 +1,14 @@
 export const regimePalette = [
-  "#0f766e",
-  "#ca8a04",
-  "#dc2626",
-  "#2563eb",
-  "#7c3aed",
-  "#db2777",
-  "#475569",
-  "#ea580c",
-  "#16a34a",
-  "#0891b2",
+  "#19f5c8",
+  "#f7c948",
+  "#ff5c7a",
+  "#6ee7ff",
+  "#a78bfa",
+  "#fb7185",
+  "#94a3b8",
+  "#f97316",
+  "#22c55e",
+  "#38bdf8",
 ];
 
 export const baseLayout = {
@@ -18,15 +18,15 @@ export const baseLayout = {
   plot_bgcolor: "rgba(0,0,0,0)",
   font: {
     family: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
-    color: "#172033",
+    color: "#d6f7ff",
   },
   hovermode: "x unified",
   xaxis: {
-    gridcolor: "rgba(148, 163, 184, 0.18)",
+    gridcolor: "rgba(110, 231, 255, 0.12)",
     zeroline: false,
   },
   yaxis: {
-    gridcolor: "rgba(148, 163, 184, 0.18)",
+    gridcolor: "rgba(110, 231, 255, 0.12)",
     zeroline: false,
   },
 };

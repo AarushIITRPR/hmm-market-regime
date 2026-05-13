@@ -1,10 +1,10 @@
 export default function Header() {
   return (
     <header className="topbar">
-      <div className="brand-mark">HMM</div>
+      <div className="brand-mark">H</div>
       <div>
-        <strong>Market Regime Dashboard</strong>
-        <span>FastAPI + React</span>
+        <strong>HMM Regime Lab</strong>
+        <span>Distributed market analysis</span>
       </div>
     </header>
   );
