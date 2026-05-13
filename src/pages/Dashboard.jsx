@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import Header from "../components/Header.jsx";
 import MetricCard from "../components/MetricCard.jsx";
+import OptimizationPanel from "../components/OptimizationPanel.jsx";
 import TickerForm from "../components/TickerForm.jsx";
 import HiddenStateTimeline from "../components/charts/HiddenStateTimeline.jsx";
 import RegimeDistributionChart from "../components/charts/RegimeDistributionChart.jsx";
@@ -22,13 +23,13 @@ export default function Dashboard() {
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  async function handleSubmit(submittedValues) {
+    setFormValues(submittedValues);
     setStatus("loading");
     setError("");
 
     try {
-      const data = await predictTickerRegimes(formValues);
+      const data = await predictTickerRegimes(submittedValues);
       setResult(data);
       setStatus("success");
     } catch (requestError) {
@@ -54,7 +55,6 @@ export default function Dashboard() {
           <TickerForm
             values={formValues}
             isLoading={status === "loading"}
-            onChange={setFormValues}
             onSubmit={handleSubmit}
           />
         </section>
@@ -87,6 +87,8 @@ export default function Dashboard() {
             </section>
           </>
         )}
+
+        <OptimizationPanel regimeResult={result} />
 
         {!hasResult && status === "idle" && (
           <section className="empty-state">

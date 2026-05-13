@@ -169,11 +169,68 @@ Useful environment variables:
 - `PORT` - backend port, defaults to `8000`.
 - `BACKEND_CORS_ORIGINS` - comma-separated list of allowed browser origins.
 
+### Kubernetes With Minikube
+
+Start Minikube:
+
+```bash
+minikube start
+```
+
+Build the Docker images inside Minikube's Docker environment.
+
+On PowerShell:
+
+```powershell
+minikube docker-env | Invoke-Expression
+docker build -t hmm-backend:latest -f Dockerfile.backend .
+docker build -t hmm-frontend:latest -f Dockerfile.frontend .
+```
+
+On macOS/Linux shells:
+
+```bash
+eval $(minikube docker-env)
+docker build -t hmm-backend:latest -f Dockerfile.backend .
+docker build -t hmm-frontend:latest -f Dockerfile.frontend .
+```
+
+Apply the Kubernetes manifests:
+
+```bash
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+```
+
+Check the running pods:
+
+```bash
+kubectl get pods
+kubectl get services
+```
+
+Open the frontend:
+
+```bash
+minikube service frontend
+```
+
+Open the backend directly:
+
+```bash
+minikube service backend
+```
+
+The frontend service uses NodePort `30080`, and the backend service uses
+NodePort `30081`. Inside the cluster, the frontend container proxies `/api`
+requests to the `backend` service.
+
 Available endpoints:
 
 - `GET /health`
 - `POST /predict`
 - `POST /predict-ticker`
+- `POST /batch-predict`
 
 Example prediction payload:
 
@@ -207,6 +264,55 @@ Example ticker prediction payload:
   "random_state": 42
 }
 ```
+
+Example batch prediction payload:
+
+```json
+{
+  "tickers": ["SPY", "QQQ", "DIA"],
+  "start_date": "2023-01-01",
+  "end_date": "2024-01-01"
+}
+```
+
+Batch prediction uses Ray remote tasks when Ray is available. If Ray cannot be
+initialized, the backend logs the issue and falls back to sequential processing
+so the API remains available.
+
+Example optimization payload:
+
+```json
+{
+  "assets": [
+    {
+      "ticker": "SPY",
+      "price": 100,
+      "expected_profit": 3,
+      "risk_score": 4,
+      "regime_label": "Low Volatility Bull"
+    },
+    {
+      "ticker": "QQQ",
+      "price": 120,
+      "expected_profit": 5,
+      "risk_score": 8,
+      "regime_label": "High Volatility Bull"
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "Base Case",
+      "budget": 500,
+      "max_risk": 25,
+      "max_units_per_asset": 5
+    }
+  ]
+}
+```
+
+Optimization follows the course architecture:
+FastAPI -> Ray Worker -> OR-Tools Solver -> Response. If Ray is unavailable, the
+same solver runs sequentially so the educational endpoint remains usable.
 
 ### Notebook Workflow
 

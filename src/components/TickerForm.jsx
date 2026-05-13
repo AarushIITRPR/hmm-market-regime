@@ -1,17 +1,30 @@
-export default function TickerForm({ values, isLoading, onChange, onSubmit }) {
+import { useEffect, useState } from "react";
+
+export default function TickerForm({ values, isLoading, onSubmit }) {
+  const [draftValues, setDraftValues] = useState(values);
+
+  useEffect(() => {
+    setDraftValues(values);
+  }, [values]);
+
   function updateField(field, value) {
-    onChange((current) => ({
+    setDraftValues((current) => ({
       ...current,
       [field]: value,
     }));
   }
 
+  function handleSubmit(event) {
+    event.preventDefault();
+    onSubmit(draftValues);
+  }
+
   return (
-    <form className="ticker-form" onSubmit={onSubmit}>
+    <form className="ticker-form" onSubmit={handleSubmit}>
       <label>
         <span>Ticker</span>
         <input
-          value={values.ticker}
+          value={draftValues.ticker}
           onChange={(event) => updateField("ticker", event.target.value)}
           required
           maxLength={20}
@@ -23,7 +36,7 @@ export default function TickerForm({ values, isLoading, onChange, onSubmit }) {
         <span>Start Date</span>
         <input
           type="date"
-          value={values.startDate}
+          value={draftValues.startDate}
           onChange={(event) => updateField("startDate", event.target.value)}
           required
         />
@@ -33,7 +46,7 @@ export default function TickerForm({ values, isLoading, onChange, onSubmit }) {
         <span>End Date</span>
         <input
           type="date"
-          value={values.endDate}
+          value={draftValues.endDate}
           onChange={(event) => updateField("endDate", event.target.value)}
           required
         />
