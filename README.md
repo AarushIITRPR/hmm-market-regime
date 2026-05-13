@@ -90,7 +90,75 @@ pip install -r requirements.txt
 
 ## Usage
 
-The project is designed to be explored sequentially through Jupyter notebooks.
+The project can now be used either as a reusable Python package or explored
+sequentially through Jupyter notebooks.
+
+### Reusable Python API
+
+```python
+from market_regime.data_loading import load_market_data
+from market_regime.inference import predict_market_regime, prediction_to_frame
+from market_regime.preprocessing import prepare_market_features
+
+data = load_market_data("SPY", start="2018-01-01")
+features = prepare_market_features(data)
+
+prediction = predict_market_regime(features)
+result = prediction_to_frame(features, prediction)
+
+hidden_states = prediction.hidden_states
+transition_probabilities = prediction.transition_probabilities
+predicted_regime_labels = prediction.predicted_regime_labels
+```
+
+The package separates the production workflow into focused modules:
+
+- `market_regime.data_loading` - CSV and Yahoo Finance loading helpers.
+- `market_regime.preprocessing` - returns, volatility, and technical features.
+- `market_regime.model_training` - HMM fitting and training result objects.
+- `market_regime.inference` - `predict_market_regime(data)` and prediction helpers.
+- `market_regime.visualization` - Plotly charts for regimes and transitions.
+- `market_regime.hmm` - the reusable univariate Gaussian HMM implementation.
+
+To run the included example:
+
+```bash
+python -m examples.predict_regime
+```
+
+### FastAPI Backend
+
+Start the minimal API backend with:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Available endpoints:
+
+- `GET /health`
+- `POST /predict`
+
+Example prediction payload:
+
+```json
+{
+  "data": [
+    {
+      "date": "2024-01-02",
+      "open": 100.0,
+      "high": 101.2,
+      "low": 99.5,
+      "close": 100.8,
+      "volume": 1200000
+    }
+  ],
+  "n_states": 3,
+  "n_iter": 200
+}
+```
+
+### Notebook Workflow
 
 Start a Jupyter server from the project's root directory:
 
