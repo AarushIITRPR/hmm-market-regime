@@ -6,7 +6,7 @@ dist
 __pycache__
 *.py[cod]
 *.log
-01_hmm_from_scratch
-02_baseline_models
+hmm_market_model
+baseline_models
 Project Report.pdf
 Mathematical Foundations.pdf

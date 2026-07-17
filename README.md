@@ -4,7 +4,7 @@
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
 [![Made with Jupyter](https://img.shields.io/badge/Made%20with-Jupyter-orange.svg)](https://jupyter.org/)
 
-A full-stack market regime detection project built around a from-scratch Gaussian Hidden Markov Model. The research notebooks explain the HMM implementation and compare it with a few focused baselines, while the FastAPI and React app provide an interactive interface for running and visualizing regime predictions.
+A full-stack market regime detection project built around a custom NumPy implementation of a Gaussian Hidden Markov Model. The research notebooks explain the HMM implementation and compare it with a few focused baselines, while the FastAPI and React app provide an interactive interface for running and visualizing regime predictions.
 
 ## Overview
 
@@ -12,7 +12,7 @@ Market regimes are periods with distinct volatility, return, or stress behavior.
 
 The project keeps the research scope focused:
 
-- implement HMM inference and training from scratch,
+- implement HMM inference and training directly in NumPy,
 - engineer financial time-series features from SPY data,
 - evaluate regimes using financial/statistical metrics,
 - compare against simple baselines,
@@ -30,11 +30,11 @@ The project keeps the research scope focused:
 
 ```text
 hmm-market-regime/
-|-- 01_hmm_from_scratch/
+|-- hmm_market_model/
 |   |-- hmm_core.py
-|   `-- 01_hmm_from_scratch.ipynb
-|-- 02_baseline_models/
-|   `-- 02_baseline_models.ipynb
+|   `-- hmm_market_model.ipynb
+|-- baseline_models/
+|   `-- baseline_models.ipynb
 |-- market_regime/
 |-- utils/
 |-- app/
@@ -66,13 +66,13 @@ pip install -r requirements.txt
 
 Run the notebooks in order:
 
-1. `01_hmm_from_scratch/01_hmm_from_scratch.ipynb`
+1. `hmm_market_model/hmm_market_model.ipynb`
    - Builds the Gaussian HMM from first principles.
    - Implements Forward, Backward, Gamma/Xi occupancy calculations, Viterbi decoding, and Baum-Welch EM.
    - Applies the model to SPY returns and interprets low-, medium-, and high-volatility regimes.
    - Evaluates state count choices using AIC/BIC and out-of-sample likelihood.
 
-2. `02_baseline_models/02_baseline_models.ipynb`
+2. `baseline_models/baseline_models.ipynb`
    - Compares the HMM workflow with GMM, K-Means, and Isolation Forest.
    - Uses engineered features such as returns, realized volatility, absolute returns, and momentum.
    - Shows what simpler clustering or anomaly-detection methods can capture, and what they miss compared with temporal HMM dynamics.
@@ -169,7 +169,7 @@ Example ticker prediction payload:
 
 ## Implementation Details
 
-### `01_hmm_from_scratch`
+### `hmm_market_model`
 
 The HMM module includes:
 
@@ -180,7 +180,7 @@ The HMM module includes:
 - `viterbi()` - most likely hidden-state sequence.
 - `GaussianHMM.fit()` - Baum-Welch EM training.
 
-### `02_baseline_models`
+### `baseline_models`
 
 The baseline notebook includes:
 
