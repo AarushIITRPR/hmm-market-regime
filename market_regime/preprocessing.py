@@ -1,4 +1,4 @@
-"""Feature engineering and input validation for regime models."""
+"""Return preparation and input validation for regime models."""
 
 from __future__ import annotations
 
@@ -19,50 +19,14 @@ def add_log_returns(data: pd.DataFrame, price_col: str = "Close") -> pd.DataFram
     return frame.dropna()
 
 
-def add_realized_volatility(
-    data: pd.DataFrame,
-    windows: Sequence[int] = (20, 60),
-    return_col: str = "Returns",
-) -> pd.DataFrame:
-    """Add annualized rolling volatility features."""
-    _require_columns(data, [return_col])
-    frame = data.copy()
-    for window in windows:
-        frame[f"RVol_{window}d"] = frame[return_col].rolling(window).std() * np.sqrt(252)
-    return frame.dropna()
-
-
-def add_technical_features(data: pd.DataFrame, return_col: str = "Returns") -> pd.DataFrame:
-    """Add common return-derived features used in regime research."""
-    _require_columns(data, [return_col])
-    frame = data.copy()
-    frame["AbsReturn"] = frame[return_col].abs()
-    frame["ReturnSq"] = frame[return_col] ** 2
-    frame["Momentum_5d"] = frame[return_col].rolling(5).sum()
-    frame["RSkew_60d"] = frame[return_col].rolling(60).skew()
-    frame["RKurt_60d"] = frame[return_col].rolling(60).kurt()
-
-    if {"Open", "High", "Low", "Close"}.issubset(frame.columns):
-        log_hl = np.log(frame["High"] / frame["Low"]) ** 2
-        log_co = np.log(frame["Close"] / frame["Open"]) ** 2
-        frame["GK_Vol"] = np.sqrt(252 * (0.5 * log_hl - (2 * np.log(2) - 1) * log_co))
-
-    return frame.dropna()
-
-
 def prepare_market_features(
     data: pd.DataFrame,
     price_col: str = "Close",
-    volatility_windows: Sequence[int] = (20, 60),
-    include_technical_features: bool = True,
 ) -> pd.DataFrame:
-    """Create a production-ready feature frame from raw OHLCV data."""
+    """Create a return frame from raw OHLCV data."""
     frame = data.copy()
     if "Returns" not in frame.columns:
         frame = add_log_returns(frame, price_col=price_col)
-    frame = add_realized_volatility(frame, windows=volatility_windows)
-    if include_technical_features:
-        frame = add_technical_features(frame)
     return frame.dropna()
 
 

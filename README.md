@@ -13,7 +13,7 @@ Market regimes are periods with distinct volatility, return, or stress behavior.
 The project keeps the research scope focused:
 
 - implement HMM inference and training directly in NumPy,
-- engineer financial time-series features from SPY data,
+- convert OHLCV market data into daily log returns,
 - evaluate regimes using financial/statistical metrics,
 - compare against simple baselines,
 - expose the model through a web interface.
@@ -22,7 +22,7 @@ The project keeps the research scope focused:
 
 - **From-scratch Gaussian HMM:** NumPy implementation of Forward-Backward inference, Viterbi decoding, and Baum-Welch parameter estimation.
 - **Focused baselines:** GMM, K-Means, and Isolation Forest are included as compact reference methods.
-- **Financial evaluation:** AIC/BIC, log-likelihood, regime persistence, regime purity, conditional Sharpe ratio, and regime statistics.
+- **Financial evaluation:** AIC/BIC, log-likelihood, regime persistence, conditional Sharpe ratio, and regime statistics.
 - **Full-stack interface:** FastAPI backend with a React/Vite dashboard for interactive predictions and charts.
 - **Reusable Python modules:** Separate package-style modules for data loading, preprocessing, model training, inference, and visualization.
 
@@ -74,7 +74,7 @@ Run the notebooks in order:
 
 2. `baseline_models/baseline_models.ipynb`
    - Compares the HMM workflow with GMM, K-Means, and Isolation Forest.
-   - Uses engineered features such as returns, realized volatility, absolute returns, and momentum.
+   - Uses the same daily return sequence as the HMM so the comparison stays easy to explain.
    - Shows what simpler clustering or anomaly-detection methods can capture, and what they miss compared with temporal HMM dynamics.
 
 ## Reusable Python API
@@ -161,7 +161,7 @@ Example ticker prediction payload:
 
 ## Methodology
 
-1. **Data acquisition and features:** Fetch OHLCV data with `yfinance`, then compute log returns, realized volatility, absolute returns, squared returns, rolling moments, and momentum.
+1. **Data acquisition and returns:** Fetch OHLCV data with `yfinance`, then compute daily log returns.
 2. **HMM training:** Learn hidden states using Baum-Welch EM over the return sequence.
 3. **Decoding:** Use posterior state probabilities and Viterbi paths to identify market regimes through time.
 4. **Interpretation:** Summarize each regime using annualized return, annualized volatility, Sharpe ratio, skewness, kurtosis, and sample share.
