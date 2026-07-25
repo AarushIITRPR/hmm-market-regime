@@ -19,12 +19,6 @@ REGIME_COLORS = {
 }
 
 
-def _plotly_x(value):
-    if hasattr(value, "isoformat"):
-        return value.isoformat()
-    return value
-
-
 def plot_price_with_regimes(
     data: pd.DataFrame,
     state_col: str = "HiddenState",
@@ -52,8 +46,8 @@ def plot_price_with_regimes(
             end += 1
         state = int(states[start])
         figure.add_vrect(
-            x0=_plotly_x(data.index[start]),
-            x1=_plotly_x(data.index[end - 1]),
+            x0=data.index[start],
+            x1=data.index[end - 1],
             fillcolor=REGIME_COLORS.get(state, "rgba(100, 116, 139, 0.16)"),
             line_width=0,
             layer="below",
