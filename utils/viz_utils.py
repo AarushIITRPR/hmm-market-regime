@@ -26,6 +26,12 @@ _DARK_LAYOUT = dict(
     legend=dict(bgcolor="rgba(30,30,40,0.8)", bordercolor="rgba(80,80,80,0.5)", borderwidth=1),
 )
 
+def _plotly_x(value):
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    return value
+
+
 def _apply_dark(fig: go.Figure) -> go.Figure:
     fig.update_layout(**_DARK_LAYOUT)
     return fig
@@ -60,34 +66,53 @@ def plot_price_with_regimes(
 
     labels = df[regime_col].values
     unique = list(dict.fromkeys(labels))
-    legend_added = set()
+    segments = []
     i = 0
     while i < len(labels):
         j = i + 1
         while j < len(labels) and labels[j] == labels[i]:
             j += 1
-        lbl = labels[i]
-        colour = REGIME_COLOURS.get(lbl, "rgba(150,150,150,0.2)")
-        show = lbl not in legend_added
-        display = (regime_labels or {}).get(lbl, str(lbl))
-        for row in [1, 2]:
-            fig.add_vrect(
-                x0=df.index[i], x1=df.index[j - 1],
-                fillcolor=colour.replace("0.85", "0.18"),
-                line_width=0,
-                row=row, col=1,
-                annotation_text="" if not show else "",
-            )
-        if show:
+        segments.append((i, j, labels[i]))
+        i = j
+
+    legend_added = set()
+
+    if len(segments) <= 120:
+        for i, j, lbl in segments:
+            colour = REGIME_COLOURS.get(lbl, "rgba(150,150,150,0.2)")
+            show = lbl not in legend_added
+            display = (regime_labels or {}).get(lbl, str(lbl))
+            for row in [1, 2]:
+                fig.add_vrect(
+                    x0=_plotly_x(df.index[i]), x1=_plotly_x(df.index[j - 1]),
+                    fillcolor=colour.replace("0.85", "0.18"),
+                    line_width=0,
+                    row=row, col=1,
+                    annotation_text="" if not show else "",
+                )
+            if show:
+                fig.add_trace(go.Scatter(
+                    x=[None], y=[None],
+                    mode="markers",
+                    marker=dict(size=12, color=colour, symbol="square"),
+                    name=display,
+                    showlegend=True,
+                ))
+                legend_added.add(lbl)
+    else:
+        for lbl in unique:
+            colour = REGIME_COLOURS.get(lbl, "rgba(150,150,150,0.85)")
+            display = (regime_labels or {}).get(lbl, str(lbl))
+            mask = labels == lbl
             fig.add_trace(go.Scatter(
-                x=[None], y=[None],
+                x=df.index[mask],
+                y=df.loc[mask, price_col],
                 mode="markers",
-                marker=dict(size=12, color=colour, symbol="square"),
+                marker=dict(size=4, color=colour, symbol="circle"),
                 name=display,
                 showlegend=True,
-            ))
-            legend_added.add(lbl)
-        i = j
+                hovertemplate="%{x|%Y-%m-%d}<br>Price: %{y:.2f}<extra></extra>",
+            ), row=1, col=1)
 
     _apply_dark(fig)
     fig.update_layout(height=600, hovermode="x unified",
