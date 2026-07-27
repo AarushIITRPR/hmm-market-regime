@@ -126,7 +126,6 @@ The frontend is served at `http://localhost:3000`; the backend is exposed at `ht
 - `POST /predict`
 - `POST /predict-ticker`
 - `POST /batch-predict`
-- `POST /optimize`
 
 Example ticker prediction payload:
 

@@ -1,6 +1,4 @@
-import { useMemo, useState } from "react";
-import MarketLattice3D from "../components/MarketLattice3D.jsx";
-import OptimizationPanel from "../components/OptimizationPanel.jsx";
+import { useEffect, useMemo, useState } from "react";
 import TickerForm from "../components/TickerForm.jsx";
 import HiddenStateTimeline from "../components/charts/HiddenStateTimeline.jsx";
 import RegimeDistributionChart from "../components/charts/RegimeDistributionChart.jsx";
@@ -16,11 +14,25 @@ const initialForm = {
   endDate: "2024-01-01",
 };
 
+const views = [
+  { id: "price", label: "Price" },
+  { id: "regimes", label: "Regime Price" },
+  { id: "states", label: "Hidden States" },
+  { id: "returns", label: "Returns" },
+  { id: "transition", label: "Transition Matrix" },
+  { id: "distribution", label: "Regime Distribution" },
+];
+
 export default function Dashboard() {
   const [formValues, setFormValues] = useState(initialForm);
   const [result, setResult] = useState(null);
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
+  const [activeView, setActiveView] = useState("price");
+
+  useEffect(() => {
+    handleSubmit(initialForm);
+  }, []);
 
   async function handleSubmit(submittedValues) {
     setFormValues(submittedValues);
@@ -39,125 +51,176 @@ export default function Dashboard() {
   }
 
   const summary = useMemo(() => buildSummary(result), [result]);
+  const ticker = result?.ticker ?? formValues.ticker.toUpperCase();
   const hasResult = Boolean(result);
 
   return (
     <div className="app-shell">
-      <MarketLattice3D />
+      <main className="terminal">
+        <QuoteHeader formValues={formValues} status={status} summary={summary} ticker={ticker} />
 
-      <main className="dashboard">
-        <section className="workspace-grid">
-          <aside className="input-panel">
-            <div className="panel-heading">
-              <p className="eyebrow">HMM Market Regime Detection</p>
-              <h1>{result?.ticker ?? formValues.ticker.toUpperCase()}</h1>
-              <span>Run ticker analysis</span>
-            </div>
+        <section className="chart-workspace">
+          <aside className="settings-rail">
+            <nav className="settings-tabs">
+              <strong>Inputs</strong>
+              <span>Outputs</span>
+              <span>Model</span>
+            </nav>
 
-            <TickerForm
-              values={formValues}
-              isLoading={status === "loading"}
-              onSubmit={handleSubmit}
-            />
+            <section className="settings-section">
+              <h2>Ticker Analysis</h2>
+              <TickerForm values={formValues} isLoading={status === "loading"} onSubmit={handleSubmit} />
+            </section>
 
-            <div className="run-defaults">
-              <span>Model defaults</span>
-              <dl>
-                <div>
-                  <dt>States</dt>
-                  <dd>3</dd>
-                </div>
-                <div>
-                  <dt>Iterations</dt>
-                  <dd>100</dd>
-                </div>
-                <div>
-                  <dt>Tolerance</dt>
-                  <dd>1e-6</dd>
-                </div>
-                <div>
-                  <dt>Seed</dt>
-                  <dd>42</dd>
-                </div>
-              </dl>
-            </div>
+            <section className="settings-section">
+              <h2>Prediction Output</h2>
+              <DataRow label="Status" value={status === "loading" ? "Running" : hasResult ? "Complete" : "Ready"} />
+              <DataRow label="Latest Close" value={summary.latestClose} />
+              <DataRow label="Latest Return" value={summary.latestReturn} />
+              <DataRow label="Latest Regime" value={summary.latestRegime} />
+              <DataRow label="Observations" value={summary.observations} />
+              <DataRow label="Hidden States" value={summary.states} />
+            </section>
+
+            <section className="settings-section">
+              <h2>Model Parameters</h2>
+              <DataRow label="n_states" value="3" />
+              <DataRow label="n_iter" value="100" />
+              <DataRow label="tol" value="1e-6" />
+              <DataRow label="random_state" value="42" />
+            </section>
 
             {error && <div className="alert">{error}</div>}
           </aside>
 
-          <section className="results-panel">
-            <SummaryBoard
-              formValues={formValues}
-              hasResult={hasResult}
-              status={status}
-              summary={summary}
-              ticker={result?.ticker ?? formValues.ticker.toUpperCase()}
-            />
+          <section className="chart-stage">
+            <div className="view-toolbar">
+              <strong>{formatRange(formValues)}</strong>
+              {views.map((view) => (
+                <button
+                  className={activeView === view.id ? "active" : ""}
+                  key={view.id}
+                  onClick={() => setActiveView(view.id)}
+                  type="button"
+                >
+                  {view.label}
+                </button>
+              ))}
+            </div>
 
-            {status === "loading" && (
-              <div className="loading-panel">
-                <div className="loader" />
-                <span>Loading regime prediction</span>
-              </div>
-            )}
+            <div className="legend-strip">
+              <LegendChip color="#6e91bd" label={`${ticker} close ${summary.latestClose}`} />
+              <LegendChip color="#5c943d" label={`Regime ${summary.latestRegime}`} />
+              <LegendChip color="#c46565" label={`${summary.states} hidden states`} />
+            </div>
 
-            {hasResult && (
-              <section className="chart-grid">
-                <StockPriceChart result={result} />
-                <RegimePriceChart result={result} />
-                <HiddenStateTimeline result={result} />
-                <ReturnsChart result={result} />
-                <TransitionHeatmap result={result} />
-                <RegimeDistributionChart result={result} />
-              </section>
-            )}
+            <div className="main-chart">
+              {status === "loading" && (
+                <div className="loading-panel">
+                  <div className="loader" />
+                  <span>Loading prediction</span>
+                </div>
+              )}
 
-            {!hasResult && status === "idle" && (
-              <section className="empty-state">
-                <h2>Ready</h2>
-                <p>Submit a ticker from the run ticket to populate the market summary and charts.</p>
-              </section>
-            )}
+              {hasResult && status !== "loading" && (
+                <ActiveView
+                  activeView={activeView}
+                  key={`${activeView}-${result.ticker}-${result.dates.length}`}
+                  result={result}
+                />
+              )}
+
+              {!hasResult && status !== "loading" && (
+                <div className="empty-state">
+                  <h2>Chart ready</h2>
+                  <p>Run a ticker analysis from the input panel.</p>
+                </div>
+              )}
+            </div>
           </section>
         </section>
-
-        <OptimizationPanel regimeResult={result} />
       </main>
     </div>
   );
 }
 
-function SummaryBoard({ formValues, hasResult, status, summary, ticker }) {
-  const rows = [
-    ["Latest close", summary.latestClose],
-    ["Latest regime", summary.latestRegime],
-    ["Observations", summary.observations],
-    ["States", summary.states],
-  ];
+function ActiveView({ activeView, result }) {
+  if (activeView === "price") {
+    return <StockPriceChart result={result} />;
+  }
 
+  if (activeView === "regimes") {
+    return <RegimePriceChart result={result} />;
+  }
+
+  if (activeView === "states") {
+    return <HiddenStateTimeline result={result} />;
+  }
+
+  if (activeView === "returns") {
+    return <ReturnsChart result={result} />;
+  }
+
+  if (activeView === "transition") {
+    return <TransitionHeatmap result={result} />;
+  }
+
+  if (activeView === "distribution") {
+    return <RegimeDistributionChart result={result} />;
+  }
+
+  return <StockPriceChart result={result} />;
+}
+
+function QuoteHeader({ formValues, status, summary, ticker }) {
   return (
-    <section className="summary-board">
-      <div className="summary-symbol">
-        <span>Instrument</span>
-        <strong>{ticker}</strong>
-        <small>
-          {formValues.startDate} to {formValues.endDate}
-        </small>
+    <header className="quote-header">
+      <div className="company-block">
+        <div className="company-title">
+          <h1>{ticker} Market Regime</h1>
+          <span>NasdaqGS</span>
+        </div>
+        <div className="quote-line">
+          <strong>{ticker}</strong>
+          <b>{summary.latestCloseRaw}</b>
+          <span>USD</span>
+          <em>{summary.latestReturn}</em>
+        </div>
+        <small>{status === "loading" ? "Running HMM prediction" : "Latest model output"}</small>
       </div>
 
-      <div className="summary-table">
-        <div className="summary-status">
-          <span>Status</span>
-          <strong>{status === "loading" ? "Running" : hasResult ? "Complete" : "Awaiting Run"}</strong>
-        </div>
-        {rows.map(([label, value]) => (
-          <div className="summary-row" key={label}>
-            <span>{label}</span>
-            <strong>{value}</strong>
-          </div>
-        ))}
-      </div>
-    </section>
+      <QuoteStat label="Start Date" value={formValues.startDate} />
+      <QuoteStat label="End Date" value={formValues.endDate} />
+      <QuoteStat label="Latest Regime" value={summary.latestRegime} />
+      <QuoteStat label="Observations" value={summary.observations} />
+      <QuoteStat label="States" value={summary.states} />
+    </header>
+  );
+}
+
+function QuoteStat({ label, value }) {
+  return (
+    <div className="quote-stat">
+      <strong>{value}</strong>
+      <span>{label}</span>
+    </div>
+  );
+}
+
+function DataRow({ label, value }) {
+  return (
+    <div className="data-row">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+function LegendChip({ color, label }) {
+  return (
+    <div className="legend-chip" style={{ borderLeftColor: color }}>
+      <strong>{label}</strong>
+    </div>
   );
 }
 
@@ -166,18 +229,27 @@ function buildSummary(result) {
     return {
       observations: "-",
       latestClose: "-",
+      latestCloseRaw: "-",
       latestRegime: "-",
+      latestReturn: "-",
       states: "-",
     };
   }
 
   const latestClose = result.close_prices.at(-1);
+  const latestReturn = result.returns.at(-1);
   const uniqueStates = new Set(result.hidden_states);
 
   return {
     observations: result.dates.length.toLocaleString(),
     latestClose: latestClose == null ? "-" : `$${latestClose.toFixed(2)}`,
+    latestCloseRaw: latestClose == null ? "-" : latestClose.toFixed(2),
     latestRegime: result.predicted_regime_labels.at(-1) ?? "-",
+    latestReturn: latestReturn == null ? "-" : `${(latestReturn * 100).toFixed(2)}%`,
     states: uniqueStates.size.toString(),
   };
+}
+
+function formatRange(formValues) {
+  return `${formValues.startDate} - ${formValues.endDate}`;
 }
