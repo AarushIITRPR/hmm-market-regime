@@ -44,8 +44,6 @@ hmm-market-regime/
 |-- Dockerfile.backend
 |-- Dockerfile.frontend
 |-- docker-compose.yml
-|-- deployment.yaml
-|-- service.yaml
 |-- requirements.txt
 |-- requirements-backend.txt
 `-- README.md
@@ -121,21 +119,6 @@ docker-compose up --build
 ```
 
 The frontend is served at `http://localhost:3000`; the backend is exposed at `http://localhost:8000`.
-
-## Kubernetes With Minikube
-
-```bash
-minikube start
-minikube docker-env | Invoke-Expression   # PowerShell
-
-docker build -t hmm-backend:latest -f Dockerfile.backend .
-docker build -t hmm-frontend:latest -f Dockerfile.frontend .
-
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
-kubectl get pods
-kubectl get services
-```
 
 ## API Endpoints
 

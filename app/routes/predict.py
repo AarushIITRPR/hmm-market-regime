@@ -45,5 +45,5 @@ def predict_ticker(request: TickerPredictionRequest) -> TickerPredictionResponse
 
 @router.post("/batch-predict", response_model=BatchPredictionResponse)
 def batch_predict(request: BatchPredictionRequest) -> BatchPredictionResponse:
-    """Predict market regimes for multiple tickers using Ray when available."""
+    """Predict market regimes for multiple tickers."""
     return batch_predict_tickers(request)

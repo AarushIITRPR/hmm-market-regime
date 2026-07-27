@@ -1,7 +1,4 @@
-"""Application entry point."""
-
 import os
-from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,20 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes.health import router as health_router
 from app.routes.optimize import router as optimize_router
 from app.routes.predict import router as predict_router
-from app.services.ray_service import initialize_ray, shutdown_ray
-
-
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    initialize_ray()
-    yield
-    shutdown_ray()
 
 
 app = FastAPI(
     title="Market Regime Detection API",
     version="0.1.0",
-    lifespan=lifespan,
 )
 
 cors_origins = [
