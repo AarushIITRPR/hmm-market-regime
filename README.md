@@ -123,9 +123,7 @@ The frontend is served at `http://localhost:3000`; the backend is exposed at `ht
 ## API Endpoints
 
 - `GET /health`
-- `POST /predict`
 - `POST /predict-ticker`
-- `POST /batch-predict`
 
 Example ticker prediction payload:
 

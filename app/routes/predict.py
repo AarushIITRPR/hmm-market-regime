@@ -3,30 +3,13 @@
 from fastapi import APIRouter, HTTPException, status
 
 from app.schemas.predict import (
-    BatchPredictionRequest,
-    BatchPredictionResponse,
-    PredictionRequest,
-    PredictionResponse,
     TickerPredictionRequest,
     TickerPredictionResponse,
 )
-from app.services.batch_service import batch_predict_tickers
-from app.services.regime_service import RegimeServiceError, predict_regimes, predict_ticker_regimes
+from app.services.regime_service import RegimeServiceError, predict_ticker_regimes
 
 
 router = APIRouter(tags=["prediction"])
-
-
-@router.post("/predict", response_model=PredictionResponse)
-def predict(request: PredictionRequest) -> PredictionResponse:
-    """Predict market regimes from OHLCV records."""
-    try:
-        return predict_regimes(request)
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
-        ) from exc
 
 
 @router.post("/predict-ticker", response_model=TickerPredictionResponse)
@@ -41,9 +24,3 @@ def predict_ticker(request: TickerPredictionRequest) -> TickerPredictionResponse
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
         ) from exc
-
-
-@router.post("/batch-predict", response_model=BatchPredictionResponse)
-def batch_predict(request: BatchPredictionRequest) -> BatchPredictionResponse:
-    """Predict market regimes for multiple tickers."""
-    return batch_predict_tickers(request)
